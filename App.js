@@ -6,7 +6,7 @@ import {
   View,
   Image,
   TouchableOpacity,
-  AsyncStorage,
+  Alert,
 } from "react-native";
 
 import Navigation from "./components/Navigation";
@@ -20,6 +20,12 @@ import Home from "./screens/Home";
 import { NavigationContainer } from "@react-navigation/native";
 
 import { Button, TextInput } from "react-native";
+
+import { useAsyncStorage } from "@react-native-async-storage/async-storage";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 
 //Just a comment for push
 
@@ -42,9 +48,39 @@ const App = () => {
 
   const [homeTodayScore, setHomeTodayScore] = React.useState(0);
 
-  const [phnoneNumber, setPhoneNumber] = React.useState("");
+  const [phoneNumber, setPhoneNumber] = React.useState("");
 
   const [oneTimePassword, setOneTimePassword] = React.useState(null);
+
+  useEffect(() => {
+    const getSessionToken = async () => {
+      const sessionToken = await AsyncStorage.getItem("sessionToken");
+
+      console.log("sessionToken", sessionToken);
+
+      const validateResponse = await fetch(
+        "https://dev.stedi.me/validate/" + sessionToken,
+
+        {
+          method: "GET",
+
+          headers: {
+            "content-type": "application/text",
+          },
+        }
+      );
+
+      if ((validateResponse.status = 200)) {
+        const userName = await validateResponse.text();
+
+        await AsyncStorage.setItem("userName", userName);
+
+        setLoggedInState(loggedInStates.LOGGED_IN);
+      }
+    };
+
+    getSessionToken();
+  });
 
   if (isFirstLaunch == true) {
     return <OnboardingScreen setFirstLaunch={setFirstLaunch} />;
@@ -115,7 +151,7 @@ const App = () => {
             console.log("This Button was pressed!");
 
             var the_url = await fetch(
-              "https://dev.stedi.me/twofactorlogin/" + phnoneNumber,
+              "https://dev.stedi.me/twofactorlogin/" + phoneNumber,
 
               {
                 method: "POST",
@@ -131,7 +167,7 @@ const App = () => {
         ></Button>
       </View>
     );
-  } else if (loggedInStates == loggedInStates.CODE_SENT) {
+  } else if (loggedInState == loggedInStates.CODE_SENT) {
     return (
       <View>
         <TextInput
@@ -179,6 +215,8 @@ const App = () => {
           onPress={async () => {
             console.log("Login Button was pressed!");
 
+            console.log(oneTimePassword, " ", phoneNumber);
+
             const loginResponse = await fetch(
               "https://dev.stedi.me/twofactorlogin",
 
@@ -190,15 +228,26 @@ const App = () => {
                 },
 
                 body: JSON.stringify({
-                  phnoneNumber: phnoneNumber,
-                  oneTimePassword: oneTimePassword,
+                  phoneNumber,
+
+                  oneTimePassword,
                 }),
               }
             );
 
+            console.log("Login response status", loginResponse.status);
+
             if (loginResponse.status == 200) {
+              const sessionToken = await loginResponse.text();
+
+              await AsyncStorage.setItem("sessionToken", sessionToken);
+
               setLoggedInState(loggedInStates.LOGGED_IN);
             } else {
+              console.log("Response Status: ", loginResponse.status);
+
+              Alert.alert("Invalid", "Invalid login infrmation");
+
               setLoggedInState(loggedInStates.NOT_LOGGED_IN);
             }
           }}
