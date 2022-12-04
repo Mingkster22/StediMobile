@@ -11,6 +11,7 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import quotes from "../data/quote.json";
 import { Card, CardTitle, CardContent } from "react-native-material-cards";
 import { LineChart } from "react-native-chart-kit";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Home = (props) => {
   const token = useRef("");
@@ -24,16 +25,21 @@ const Home = (props) => {
     let scoreObject = {};
     try {
       const sessionToken = await AsyncStorage.getItem("sessionToken");
+      console.log("sessionToken in Home", sessionToken);
       const userName = await AsyncStorage.getItem("userName");
+      console.log("userName", userName);
       token.current = sessionToken;
 
-      const scoreResponse = await fetch(AAAAA + userName, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "suresteps.session.token": token.current,
-        },
-      });
+      const scoreResponse = await fetch(
+        "https://dev.stedi.me/riskscore/" + userName,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "suresteps.session.token": token.current,
+          },
+        }
+      );
       console.log("token:", token.current);
       scoreObject = await scoreResponse.json();
       setScore(scoreObject.score);

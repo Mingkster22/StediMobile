@@ -21,8 +21,6 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import { Button, TextInput } from "react-native";
 
-import { useAsyncStorage } from "@react-native-async-storage/async-storage";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // import AsyncStorage from '@react-native-async-storage/async-storage';
