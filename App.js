@@ -68,7 +68,7 @@ const App = () => {
         }
       );
 
-      if ((validateResponse.status = 200)) {
+      if (validateResponse.status == 200) {
         const userName = await validateResponse.text();
 
         await AsyncStorage.setItem("userName", userName);
@@ -125,7 +125,7 @@ const App = () => {
 
             backgroundColor: "#ffbd4f",
           }}
-          value={setPhoneNumber}
+          value={phoneNumber}
           onChangeText={setPhoneNumber}
         ></TextInput>
 

@@ -32,6 +32,7 @@ import {
 import exerciseImg from "../image/exercise2.png";
 import ProgressBar from "react-native-progress/Bar";
 import { FontAwesome5 } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // import { Ionicons} from 'react-native-vector-icons';
 // import { Button } from 'react-native-elements';
 // import { IconButton } from 'react-native-paper';
@@ -89,6 +90,7 @@ export default function Counter(props) {
   const stopTime = useRef(0);
   const testTime = useRef(0);
   const token = useRef("");
+  const userName = useRef("");
 
   const savingSteps = async (event) => {
     //how to get startime, stepPoints, StopTime, TestTime
@@ -110,7 +112,7 @@ export default function Counter(props) {
     stepPoints.length = 30;
     try {
       const sessionToken = await AsyncStorage.getItem("sessionToken");
-      const userName = await AsyncStorage.getItem("userName");
+      userName.current = await AsyncStorage.getItem("userName");
       token.current = sessionToken;
 
       console.log("token:", token.current);
@@ -121,7 +123,7 @@ export default function Counter(props) {
           "suresteps.session.token": token.current,
         },
         body: JSON.stringify({
-          customer: userName,
+          customer: userName.current,
           startTime: startTime.current,
           stepPoints,
           stopTime: stopTime.current,
@@ -139,7 +141,7 @@ export default function Counter(props) {
   const getResults = async () => {
     try {
       const scoreResponse = await fetch(
-        "https://dev.stedi.me/riskscore/rom19010@byui.edu",
+        "https://dev.stedi.me/riskscore/" + userName.current,
         {
           method: "GET",
           headers: {
@@ -151,7 +153,6 @@ export default function Counter(props) {
       const scoreObject = await scoreResponse.json();
       console.log("score:", scoreObject.score);
       setScore(scoreObject.score);
-      props.setHomeTodayScore(scoreObject.score);
     } catch (error) {
       console.log("error", error);
     }

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+
 import {
   StyleSheet,
   Text,
@@ -7,42 +8,61 @@ import {
   ScrollView,
   Linking,
 } from "react-native";
+
 import { FontAwesome5 } from "@expo/vector-icons";
+
 import quotes from "../data/quote.json";
+
 import { Card, CardTitle, CardContent } from "react-native-material-cards";
+
 import { LineChart } from "react-native-chart-kit";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = (props) => {
   const token = useRef("");
+
   const [score, setScore] = useState(0);
+
   useEffect(() => {
     todayScore();
   }, []);
 
   //today score
+
   const todayScore = async () => {
     let scoreObject = {};
+
     try {
       const sessionToken = await AsyncStorage.getItem("sessionToken");
-      console.log("sessionToken in Home", sessionToken);
+
       const userName = await AsyncStorage.getItem("userName");
-      console.log("userName", userName);
+
       token.current = sessionToken;
+      console.log("token.current:", token.current);
+      console.log("userName:", userName);
 
       const scoreResponse = await fetch(
         "https://dev.stedi.me/riskscore/" + userName,
         {
           method: "GET",
+
           headers: {
             "Content-Type": "application/json",
+
             "suresteps.session.token": token.current,
           },
         }
       );
-      console.log("token:", token.current);
+
+      console.log("The token:", token.current);
+
       scoreObject = await scoreResponse.json();
+
       setScore(scoreObject.score);
+
       console.log(scoreObject.score);
     } catch (error) {
       console.log("error", error);
@@ -54,6 +74,7 @@ const Home = (props) => {
   //monthly average time
 
   // color
+
   let backgroundColors = [
     "#0c5d8f",
     "#e7a740",
@@ -63,6 +84,7 @@ const Home = (props) => {
     "#e17f93",
     "#fee227",
   ];
+
   let colors = [
     "#b4cfec",
     "#f7dcb0",
@@ -76,21 +98,30 @@ const Home = (props) => {
   var day = new Date();
 
   const backgroundColorsToday = backgroundColors[day.getDay()];
+
   const colorsToday = colors[day.getDay()];
 
   //date
+
   const date = new Date();
+
   const time = date.getTime(); // the timestamp, not neccessarely using UTC as current time
+
   const julian_day = Math.floor(
     time / 86400000 - date.getTimezoneOffset() / 1440 + 2440587.5
   );
+
   const dayQuoteIndex = julian_day - 2459778;
+
   const quote = quotes[dayQuoteIndex].text;
+
   const author = quotes[dayQuoteIndex].author;
 
   return (
-    <ScrollView>
-      <SafeAreaView style={{ alignItems: "center" }}>
+    <ScrollView style={{ backgroundColor: "#bac44a" }}>
+      <SafeAreaView
+        style={{ alignItems: "center", backgroundColor: "#63d1ec" }}
+      >
         <View
           style={{
             width: "90%",
@@ -104,6 +135,7 @@ const Home = (props) => {
             name="quote-left"
             style={{ fontSize: 30, marginBottom: 1, color: colorsToday }}
           />
+
           <Text
             style={{
               fontSize: 16,
@@ -118,6 +150,7 @@ const Home = (props) => {
           >
             {quote}
           </Text>
+
           <Text
             style={{
               textAlign: "right",
@@ -130,16 +163,18 @@ const Home = (props) => {
             ― {author}
           </Text>
         </View>
+
         <Text
           style={{
             marginTop: 12,
             fontSize: 20,
             marginRight: 230,
-            color: "#B4B4B4",
+            color: "#FFFF",
           }}
         >
           Activity
         </Text>
+
         <View
           style={{
             flexDirection: "row",
@@ -158,15 +193,20 @@ const Home = (props) => {
               shadowOpacity: 0.23,
               shadowRadius: 2.62,
               elevation: 4,
+              backgroundColor: "#bac44a",
             }}
           >
             <CardTitle titleStyle={{ fontSize: 17 }} title="Today" />
-            <Text style={{ fontSize: 35, fontWeight: "bold", color: "black" }}>
+
+            <Text style={{ fontSize: 50, fontWeight: "bold", color: "black" }}>
               {score}
             </Text>
+
             <FontAwesome5 name="arrow-down" />
+
             <CardContent></CardContent>
           </Card>
+
           <Card
             style={{
               width: "50%",
@@ -178,6 +218,7 @@ const Home = (props) => {
               shadowOpacity: 0.23,
               shadowRadius: 2.62,
               elevation: 4,
+              backgroundColor: "#a18089",
             }}
           >
             <CardTitle
@@ -190,9 +231,11 @@ const Home = (props) => {
               title="Weekly"
               subtitle={20}
             />
+
             <CardContent></CardContent>
           </Card>
         </View>
+
         <View
           style={{ flexDirection: "row", paddingLeft: 15, paddingRight: 15 }}
         >
@@ -207,6 +250,7 @@ const Home = (props) => {
               shadowOpacity: 0.23,
               shadowRadius: 2.62,
               elevation: 4,
+              backgroundColor: "#f7e6g0",
             }}
           >
             <CardTitle
@@ -221,6 +265,7 @@ const Home = (props) => {
 
               //average score
             />
+
             <CardContent style={{ paddingLeft: 5 }}>
               <LineChart
                 data={{
@@ -256,6 +301,7 @@ const Home = (props) => {
                     "29",
                     "30",
                   ],
+
                   datasets: [
                     {
                       data: [
@@ -271,24 +317,34 @@ const Home = (props) => {
                 yAxisInterval={1} // optional, defaults to 1
                 chartConfig={{
                   backgroundColor: "#f4f4f4",
+
                   backgroundGradientFrom: "#fb8c00",
+
                   backgroundGradientTo: "#ffa726",
+
                   decimalPlaces: 0, // optional, defaults to 2dp
+
                   color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+
                   labelColor: (opacity = 1) =>
                     `rgba(255, 255, 255, ${opacity})`,
+
                   style: {
                     borderRadius: 16,
                   },
+
                   propsForDots: {
                     r: "6",
+
                     strokeWidth: "2",
+
                     stroke: "#ffa726",
                   },
                 }}
                 bezier
                 style={{
                   marginVertical: 8,
+
                   borderRadius: 16,
                 }}
               />
@@ -301,6 +357,7 @@ const Home = (props) => {
 };
 
 export default Home;
+
 const styles = StyleSheet.create({
   container: {},
 });

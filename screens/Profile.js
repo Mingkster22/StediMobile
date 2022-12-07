@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   Share,
   ScrollView,
   Button,
+  TouchableOpacity,
 } from "react-native";
 import { Card, CardTitle, CardContent } from "react-native-material-cards";
 import BarChart from "react-native-bar-chart";
@@ -118,12 +119,12 @@ const Profile = (props) => {
           <CardContent>
             <Image
               style={{ height: 100, width: 100, borderRadius: 75 }}
-              source={require("../image/me.jpg")}
+              source={{ uri: profilePhoto }}
             />
             <Text
               style={{ marginTop: 10, marginBottom: 10, fontWeight: "bold" }}
             >
-              Sarah Romero
+              {userName}
             </Text>
 
             <Text style={{ marginTop: 20, marginBottom: 2 }}>
@@ -143,6 +144,26 @@ export default Profile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "center",
     padding: 20,
+  },
+  camera: {
+    flex: 1,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    margin: 64,
+  },
+  button: {
+    flex: 1,
+    alignSelf: "flex-end",
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "white",
   },
 });
